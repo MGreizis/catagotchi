@@ -11,6 +11,9 @@ export default class Cat {
         this.meow();
     }
     ignore() {
+        if (this.getHunger() >= 10 || this.getEnergy() < 0) {
+            this.catDied();
+        }
         this.energy -= (Math.random() > 0.7 ? 1 : 0);
         this.mood -= (Math.random() > 0.4 ? 1 : 0);
         this.hunger += (Math.random() > 0.2 ? 1 : 0);
