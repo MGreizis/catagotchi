@@ -1,11 +1,7 @@
-class Catagotchi {
-  private alive : boolean;
+import Cat from './Cat.js';
 
-  private mood : number;
-
-  private energy : number;
-
-  private hunger : number;
+class Game {
+  private cat : Cat;
 
   private gameDOM : Element;
 
@@ -29,36 +25,21 @@ class Catagotchi {
    */
   constructor(gameDOM : Element) {
     this.gameDOM = gameDOM;
-    this.alive = true;
-    this.mood = 10;
-    this.energy = 10;
-    this.hunger = 0;
+    this.cat = new Cat();
+
     this.getDOMElements();
     this.updateDisplays();
     this.startRunning();
-    this.meow();
-  }
-
-  /**
-   * Meow says the cat.
-   * Not accessible directly, but is used as a response by certain actions.
-   * TODO: Add some sound effects
-   */
-  private meow() : void {
-    if (!this.alive) {
-      throw new Error('Dead catagotchi cannot meow. Something is wrong.');
-    }
-    console.log('meow!');
   }
 
   /**
    * Update the displays on the DOM with current state of attributes.
    */
   private updateDisplays() {
-    this.displayMood.innerHTML = String(this.mood);
-    this.displayHunger.innerHTML = String(this.hunger);
-    this.displayEnergy.innerHTML = String(this.energy);
-    this.displayStatus.innerHTML = (this.alive === true ? 'Alive' : 'Dead');
+    this.displayMood.innerHTML = String(this.cat.getMood());
+    this.displayHunger.innerHTML = String(this.cat.getHunger());
+    this.displayEnergy.innerHTML = String(this.cat.getEnergy());
+    this.displayStatus.innerHTML = (this.cat.isAlive() === true ? 'Alive' : 'Dead');
   }
 
   /**
@@ -67,51 +48,15 @@ class Catagotchi {
    * TODO: move the update of attributes to its own function.
    */
   public gameTick() {
-    if (this.alive) {
-      if (this.hunger >= 10 || this.energy < 0) {
-        this.catDied();
+    if (this.cat.isAlive()) {
+      if (this.cat.getHunger() >= 10 || this.cat.getEnergy() < 0) {
+        this.cat.catDied();
       }
 
-      this.energy -= (Math.random() > 0.7 ? 1 : 0);
-      this.mood -= (Math.random() > 0.4 ? 1 : 0);
-      this.hunger += (Math.random() > 0.2 ? 1 : 0);
+      this.cat.ignore();
 
       this.updateDisplays();
     }
-  }
-
-  /**
-   * Poor catagotchi died.
-   */
-  private catDied() {
-    this.alive = false;
-  }
-
-  /**
-   * Feed the Catagotchi. Will improve mood and reduce hunger.
-   */
-  public feed() {
-    this.hunger -= 2;
-    this.mood += 1;
-    this.meow();
-  }
-
-  /**
-   * Play with the Catagotchi. It does make Catagotchi sleepy, though.
-   */
-  public play() {
-    this.mood += 1;
-    this.energy -= 2;
-    this.hunger += 1;
-  }
-
-  /**
-   * Ask Catagotchi to sleeeeep. Improved mood and energy, but makes it hungry too.
-   */
-  public sleep() {
-    this.energy += 2;
-    this.hunger += 1;
-    this.mood += 1;
   }
 
   private getDOMElements() {
@@ -120,9 +65,9 @@ class Catagotchi {
     this.displayEnergy = this.gameDOM.querySelector('#displayEnergy');
     this.displayStatus = this.gameDOM.querySelector('#displayStatus');
 
-    this.gameDOM.querySelector('#buttonFeed').addEventListener('click', this.feed.bind(this));
-    this.gameDOM.querySelector('#buttonPlay').addEventListener('click', this.play.bind(this));
-    this.gameDOM.querySelector('#buttonSleep').addEventListener('click', this.sleep.bind(this));
+    this.gameDOM.querySelector('#buttonFeed').addEventListener('click', this.cat.feed.bind(this));
+    this.gameDOM.querySelector('#buttonPlay').addEventListener('click', this.cat.play.bind(this));
+    this.gameDOM.querySelector('#buttonSleep').addEventListener('click', this.cat.sleep.bind(this));
   }
 
   /**
@@ -157,7 +102,7 @@ class Catagotchi {
 }
 
 const init = () => {
-  const catGame = new Catagotchi(document.querySelector('#game'));
+  const catGame = new Game(document.querySelector('#game'));
 };
 
 window.addEventListener('load', init);
