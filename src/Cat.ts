@@ -24,6 +24,10 @@ export default class Cat {
    * Call when the cat is ignored, decreasing its general health
    */
   public ignore(): void {
+    if (this.getHunger() >= 10 || this.getEnergy() < 0) {
+      this.catDied();
+    }
+
     this.energy -= (Math.random() > 0.7 ? 1 : 0);
     this.mood -= (Math.random() > 0.4 ? 1 : 0);
     this.hunger += (Math.random() > 0.2 ? 1 : 0);

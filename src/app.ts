@@ -49,12 +49,7 @@ class Game {
    */
   public gameTick() {
     if (this.cat.isAlive()) {
-      if (this.cat.getHunger() >= 10 || this.cat.getEnergy() < 0) {
-        this.cat.catDied();
-      }
-
       this.cat.ignore();
-
       this.updateDisplays();
     }
   }
