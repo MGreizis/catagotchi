@@ -27,34 +27,35 @@ export default class Cat {
     catDied() {
         this.alive = false;
     }
-    feed() {
+    feed = () => {
         this.hunger -= 2;
         this.mood += 1;
-        console.log('Cat has been fed');
-    }
-    play() {
+        this.meow();
+        console.log('The cat has been fed');
+    };
+    play = () => {
         this.mood += 1;
         this.energy -= 2;
         this.hunger += 1;
-        console.log('Cat has been played with');
-    }
-    sleep() {
+        console.log('The cat has been played with');
+    };
+    sleep = () => {
         this.energy += 2;
         this.hunger += 1;
         this.mood += 1;
-        console.log('Cat has had a good nap');
-    }
-    isAlive() {
-        return this.alive;
-    }
-    getMood() {
-        return this.mood;
-    }
+        console.log('The cat has had a good nap');
+    };
     getEnergy() {
         return this.energy;
     }
     getHunger() {
         return this.hunger;
+    }
+    getMood() {
+        return this.mood;
+    }
+    isAlive() {
+        return this.alive;
     }
 }
 //# sourceMappingURL=Cat.js.map

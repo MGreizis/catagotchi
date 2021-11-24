@@ -1,39 +1,62 @@
 import Cat from './Cat.js';
-class Game {
+import KeyListener from './KeyListener.js';
+class Catagotchi {
     cat;
-    gameDOM;
-    displayMood;
-    displayEnergy;
-    displayHunger;
-    displayStatus;
+    keyListener;
+    canvas;
+    ctx;
+    catImage;
     lastTickTimeStamp;
-    constructor(gameDOM) {
-        this.gameDOM = gameDOM;
+    constructor(canvas) {
+        this.canvas = canvas;
+        this.ctx = this.canvas.getContext('2d');
+        this.canvas.height = window.innerHeight;
+        this.canvas.width = window.innerWidth;
+        this.catImage = this.loadNewImage('img/NORMAL CAT.png');
         this.cat = new Cat();
-        this.getDOMElements();
-        this.updateDisplays();
+        this.keyListener = new KeyListener();
         this.startRunning();
+        this.updateDisplays();
+    }
+    writeTextToCanvas(text, xCoordinate, yCoordinate, fontSize = 20, color = 'red', alignment = 'center') {
+        this.ctx.font = `${fontSize}px sans-serif`;
+        this.ctx.fillStyle = color;
+        this.ctx.textAlign = alignment;
+        this.ctx.fillText(text, xCoordinate, yCoordinate);
+    }
+    loadNewImage(source) {
+        const img = new Image();
+        img.src = source;
+        return img;
     }
     updateDisplays() {
-        this.displayMood.innerHTML = String(this.cat.getMood());
-        this.displayHunger.innerHTML = String(this.cat.getHunger());
-        this.displayEnergy.innerHTML = String(this.cat.getEnergy());
-        this.displayStatus.innerHTML = (this.cat.isAlive() === true ? 'Alive' : 'Dead');
+        this.clearScreen();
+        this.ctx.drawImage(this.catImage, 100, 0, this.canvas.height / 2, this.canvas.width / 2);
+        this.writeTextToCanvas((this.cat.isAlive() ? 'Cat is alive' : 'Cat byebye'), 20, 30, 20, 'blue', 'left');
+        this.writeTextToCanvas(`Mood: ${this.cat.getMood()}`, 20, 60, 20, 'green', 'left');
+        this.writeTextToCanvas(`Energy: ${this.cat.getEnergy()}`, 20, 90, 20, 'red', 'left');
+        this.writeTextToCanvas(`Hunger: ${this.cat.getHunger()}`, 20, 120, 20, 'yellow', 'left');
+    }
+    clearScreen() {
+        this.ctx.clearRect(0, 0, this.canvas.height, this.canvas.width);
     }
     gameTick() {
         if (this.cat.isAlive()) {
             this.cat.ignore();
+            this.executeUserAction();
             this.updateDisplays();
         }
     }
-    getDOMElements() {
-        this.displayHunger = this.gameDOM.querySelector('#displayHunger');
-        this.displayMood = this.gameDOM.querySelector('#displayMood');
-        this.displayEnergy = this.gameDOM.querySelector('#displayEnergy');
-        this.displayStatus = this.gameDOM.querySelector('#displayStatus');
-        this.gameDOM.querySelector('#buttonFeed').addEventListener('click', this.cat.feed.bind(this));
-        this.gameDOM.querySelector('#buttonPlay').addEventListener('click', this.cat.play.bind(this));
-        this.gameDOM.querySelector('#buttonSleep').addEventListener('click', this.cat.sleep.bind(this));
+    executeUserAction() {
+        if (this.keyListener.isKeyDown(KeyListener.KEY_F)) {
+            this.cat.feed();
+        }
+        if (this.keyListener.isKeyDown(KeyListener.KEY_P)) {
+            this.cat.play();
+        }
+        if (this.keyListener.isKeyDown(KeyListener.KEY_S)) {
+            this.cat.sleep();
+        }
     }
     startRunning() {
         this.lastTickTimeStamp = performance.now();
@@ -47,8 +70,6 @@ class Game {
         requestAnimationFrame(this.step);
     };
 }
-const init = () => {
-    const catGame = new Game(document.querySelector('#game'));
-};
+const init = () => new Catagotchi(document.querySelector('#canvas'));
 window.addEventListener('load', init);
 //# sourceMappingURL=app.js.map
