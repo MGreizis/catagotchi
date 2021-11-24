@@ -1,7 +1,10 @@
 import Cat from './Cat.js';
+import KeyListener from './KeyListener.js';
 
-class Game {
-  private cat : Cat;
+class Catagotchi {
+  private cat: Cat;
+
+  private keyListener: KeyListener;
 
   private gameDOM : Element;
 
@@ -25,7 +28,9 @@ class Game {
    */
   constructor(gameDOM : Element) {
     this.gameDOM = gameDOM;
+
     this.cat = new Cat();
+    this.keyListener = new KeyListener();
 
     this.getDOMElements();
     this.updateDisplays();
@@ -39,7 +44,7 @@ class Game {
     this.displayMood.innerHTML = String(this.cat.getMood());
     this.displayHunger.innerHTML = String(this.cat.getHunger());
     this.displayEnergy.innerHTML = String(this.cat.getEnergy());
-    this.displayStatus.innerHTML = (this.cat.isAlive() === true ? 'Alive' : 'Dead');
+    this.displayStatus.innerHTML = (this.cat.isAlive() ? 'Alive' : 'Dead');
   }
 
   /**
@@ -50,7 +55,24 @@ class Game {
   public gameTick() {
     if (this.cat.isAlive()) {
       this.cat.ignore();
+
+      this.executeUserAction();
+
       this.updateDisplays();
+    }
+  }
+
+  private executeUserAction() {
+    if (this.keyListener.isKeyDown(KeyListener.KEY_F)) {
+      this.cat.feed();
+    }
+
+    if (this.keyListener.isKeyDown(KeyListener.KEY_P)) {
+      this.cat.play();
+    }
+
+    if (this.keyListener.isKeyDown(KeyListener.KEY_S)) {
+      this.cat.sleep();
     }
   }
 
@@ -59,10 +81,6 @@ class Game {
     this.displayMood = this.gameDOM.querySelector('#displayMood');
     this.displayEnergy = this.gameDOM.querySelector('#displayEnergy');
     this.displayStatus = this.gameDOM.querySelector('#displayStatus');
-
-    this.gameDOM.querySelector('#buttonFeed').addEventListener('click', this.cat.feed.bind(this));
-    this.gameDOM.querySelector('#buttonPlay').addEventListener('click', this.cat.play.bind(this));
-    this.gameDOM.querySelector('#buttonSleep').addEventListener('click', this.cat.sleep.bind(this));
   }
 
   /**
@@ -96,8 +114,11 @@ class Game {
   };
 }
 
-const init = () => {
-  const catGame = new Game(document.querySelector('#game'));
-};
+/**
+ * Actually start the game
+ *
+ * @returns nothing
+ */
+const init = () => new Catagotchi(document.querySelector('#game'));
 
 window.addEventListener('load', init);
