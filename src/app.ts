@@ -6,15 +6,11 @@ class Catagotchi {
 
   private keyListener: KeyListener;
 
-  private gameDOM : Element;
+  private readonly canvas : HTMLCanvasElement;
 
-  private displayMood : HTMLDivElement;
+  private readonly ctx : CanvasRenderingContext2D;
 
-  private displayEnergy : HTMLDivElement;
-
-  private displayHunger : HTMLDivElement;
-
-  private displayStatus : HTMLDivElement;
+  private catImage : HTMLImageElement;
 
   private lastTickTimeStamp : number;
 
@@ -24,27 +20,58 @@ class Catagotchi {
    * Once set, the DOM elements will be gathered and updated.
    * Finally, the cat will meow to indicate that it is indeed alive!
    *
-   * @param gameDOM pass the DOM element where the game will run.
+   * @param canvas pass the DOM element where the game will run.
    */
-  constructor(gameDOM : Element) {
-    this.gameDOM = gameDOM;
+  constructor(canvas : HTMLCanvasElement) {
+    this.canvas = canvas;
+    this.ctx = this.canvas.getContext('2d');
+
+    this.canvas.height = window.innerHeight;
+    this.canvas.width = window.innerWidth;
+
+    this.catImage = this.loadNewImage('img/NORMAL CAT.png');
 
     this.cat = new Cat();
     this.keyListener = new KeyListener();
 
-    this.getDOMElements();
-    this.updateDisplays();
     this.startRunning();
+    this.updateDisplays();
   }
 
-  /**
-   * Update the displays on the DOM with current state of attributes.
-   */
+  private writeTextToCanvas(
+    text: string,
+    xCoordinate: number,
+    yCoordinate: number,
+    fontSize = 20,
+    color = 'red',
+    alignment: CanvasTextAlign = 'center',
+  ) {
+    this.ctx.font = `${fontSize}px sans-serif`;
+    this.ctx.fillStyle = color;
+    this.ctx.textAlign = alignment;
+    this.ctx.fillText(text, xCoordinate, yCoordinate);
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  private loadNewImage(source: string) : HTMLImageElement {
+    const img = new Image();
+    img.src = source;
+    return img;
+  }
+
   private updateDisplays() {
-    this.displayMood.innerHTML = String(this.cat.getMood());
-    this.displayHunger.innerHTML = String(this.cat.getHunger());
-    this.displayEnergy.innerHTML = String(this.cat.getEnergy());
-    this.displayStatus.innerHTML = (this.cat.isAlive() ? 'Alive' : 'Dead');
+    this.clearScreen();
+
+    this.ctx.drawImage(this.catImage, 100, 0, this.canvas.height / 2, this.canvas.width / 2);
+
+    this.writeTextToCanvas((this.cat.isAlive() ? 'Cat is alive' : 'Cat byebye'), 20, 30, 20, 'blue', 'left');
+    this.writeTextToCanvas(`Mood: ${this.cat.getMood()}`, 20, 60, 20, 'green', 'left');
+    this.writeTextToCanvas(`Energy: ${this.cat.getEnergy()}`, 20, 90, 20, 'red', 'left');
+    this.writeTextToCanvas(`Hunger: ${this.cat.getHunger()}`, 20, 120, 20, 'yellow', 'left');
+  }
+
+  private clearScreen() {
+    this.ctx.clearRect(0, 0, this.canvas.height, this.canvas.width);
   }
 
   /**
@@ -55,9 +82,7 @@ class Catagotchi {
   public gameTick() {
     if (this.cat.isAlive()) {
       this.cat.ignore();
-
       this.executeUserAction();
-
       this.updateDisplays();
     }
   }
@@ -74,13 +99,6 @@ class Catagotchi {
     if (this.keyListener.isKeyDown(KeyListener.KEY_S)) {
       this.cat.sleep();
     }
-  }
-
-  private getDOMElements() {
-    this.displayHunger = this.gameDOM.querySelector('#displayHunger');
-    this.displayMood = this.gameDOM.querySelector('#displayMood');
-    this.displayEnergy = this.gameDOM.querySelector('#displayEnergy');
-    this.displayStatus = this.gameDOM.querySelector('#displayStatus');
   }
 
   /**
@@ -119,6 +137,6 @@ class Catagotchi {
  *
  * @returns nothing
  */
-const init = () => new Catagotchi(document.querySelector('#game'));
+const init = () => new Catagotchi(document.querySelector('#canvas'));
 
 window.addEventListener('load', init);

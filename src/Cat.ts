@@ -58,6 +58,7 @@ export default class Cat {
     this.hunger -= 2;
     this.mood += 1;
     this.meow();
+    console.log('The cat has been fed');
   };
 
   /**
@@ -67,6 +68,7 @@ export default class Cat {
     this.mood += 1;
     this.energy -= 2;
     this.hunger += 1;
+    console.log('The cat has been played with');
   };
 
   /**
@@ -76,6 +78,7 @@ export default class Cat {
     this.energy += 2;
     this.hunger += 1;
     this.mood += 1;
+    console.log('The cat has had a good nap');
   };
 
   /**
